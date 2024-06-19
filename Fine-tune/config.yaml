@@ -1,0 +1,17 @@
+text_embedding:
+  max_length: 128
+  truncation: True
+  pretrained_name: google-bert/bert-base-cased
+
+model:
+  num_labels: 5
+
+dropout: 0.2
+patience: 5
+learning_rate: 0.00005
+num_epochs: 5
+seed: 42
+train_batch: 128
+test_batch: 128
+dev_batch: 128
+save_path: ./checkpoint
