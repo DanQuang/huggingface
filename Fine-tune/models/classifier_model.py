@@ -7,7 +7,7 @@ class Classifier_Model(nn.Module):
     def __init__(self, config):
         super(Classifier_Model, self).__init__()
         self.embedding = Pretrained_Embedding(config)
-        self.classifier = nn.Linear(self.embedding.config.hidden_size, config["model"]["num_labels"])
+        self.classifier = nn.Linear(self.embedding.embedding.config.hidden_size, config["model"]["num_labels"])
 
     def forward(self, texts):
         embedding = self.embedding(texts)

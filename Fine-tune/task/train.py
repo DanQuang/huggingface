@@ -67,7 +67,7 @@ class Train_Task:
         self.model.train()
         for epoch in range(initial_epoch, initial_epoch + self.num_epochs):
             epoch_loss = 0
-            for _, item in enumerate(self.train):
+            for _, item in enumerate(self.train_dataloader):
                 texts, labels = item["text"], item["label"]
 
                 self.optimizer.zero_grad()
