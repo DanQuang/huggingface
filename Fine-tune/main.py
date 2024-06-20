@@ -5,7 +5,7 @@ import logging
 from typing import Text
 
 from task.train import Train_Task
-# from task.infer import Infer_Task
+from task.infer import Infer_Task
 
 def main(config_path: Text) -> None:
     logging.basicConfig(level=logging.INFO)
@@ -18,9 +18,9 @@ def main(config_path: Text) -> None:
 
     logging.info("Train complete")
 
-    # logging.info("Evaluating...")
-    # Infer_Task(config).predict()
-    # logging.info("Task done!!!")
+    logging.info("Evaluating...")
+    Infer_Task(config).predict()
+    logging.info("Task done!!!")
 
 if __name__ == "__main__":
     args_parser = argparse.ArgumentParser()

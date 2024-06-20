@@ -59,29 +59,64 @@ class Train_Task:
             checkpoint = torch.load(os.path.join(self.save_path, best_model))
             best_score = checkpoint['score']
         else:
-            best_score = 0.
+            best_score = float('inf')
 
         threshold = 0
         print(f"The Pretrained model has {count_trainable_parameters(model= self.model)} trainable parameters")
-        progress_bar = tqdm(range(self.num_training_steps))
         self.model.train()
         for epoch in range(initial_epoch, initial_epoch + self.num_epochs):
             epoch_loss = 0
-            for _, item in enumerate(self.train_dataloader):
-                texts, labels = item["text"], item["label"]
+            for _, item in enumerate(tqdm(self.train_dataloader)):
+                texts, labels = item["text"], item["label"].to(self.device)
 
                 self.optimizer.zero_grad()
 
                 outputs = self.model(texts)
 
                 loss = self.loss(outputs, labels)
+                epoch_loss += loss.item()
+                loss.backward()
 
                 self.optimizer.step()
                 self.lr_scheduler.step()
-                progress_bar.update(1)
-
-                epoch_loss += loss.item()
-            
+                           
             train_loss = epoch_loss / len(self.train_dataloader)
             print(f"Epoch {epoch}:")
             print(f"Train loss: {train_loss:.5f}")
+
+            epoch_loss = 0
+            with torch.inference_mode():
+              for _, item in enumerate(self.dev_dataloader):
+                texts, labels = item["text"], item["label"].to(self.device)
+                outputs = self.model(texts)
+
+                loss = self.loss(outputs, labels)
+                epoch_loss += loss.item()
+            
+            dev_loss = epoch_loss / len(self.dev_dataloader)
+            score = dev_loss
+            print(f"Dev loss: {dev_loss:.5f}")
+
+            # save last model
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': self.model.state_dict(),
+                'optim_state_dict': self.optimizer.state_dict(),
+                'score': score
+            }, os.path.join(self.save_path, last_model))
+
+            # save the best model
+            if epoch > 0 and score > best_score:
+                threshold += 1
+            else:
+                threshold = 0
+
+            if score <= best_score:
+                best_score = score
+                torch.save({
+                    'epoch': epoch,
+                    'model_state_dict': self.model.state_dict(),
+                    'optim_state_dict': self.optimizer.state_dict(),
+                    'score':score
+                }, os.path.join(self.save_path, best_model))
+                print(f"Saved the best model with valid loss of {score:.5f}")
