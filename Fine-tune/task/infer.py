@@ -22,7 +22,7 @@ class Infer_Task:
 
         self.test_dataloader = self.load_data.load_test()
     
-    def train(self):
+    def predict(self):
         best_model = "Pretrained_best_model.pth"
 
         if os.path.join(self.save_path, best_model):
