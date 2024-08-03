@@ -27,3 +27,5 @@ class Pretrained_Embedding(nn.Module):
 
         return output
         
+    def test_func(a: int):
+        print(a)
